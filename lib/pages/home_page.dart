@@ -13,7 +13,7 @@ class Home extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: const Text('Smart Plug'),
         backgroundColor: Colors.green,
       ),
       drawer: Drawer(
@@ -26,9 +26,9 @@ class Home extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    'Привіт, $username!',
-                    style: const TextStyle(color: Colors.white, fontSize: 20),
+                  const Text(
+                    'Smart Plug',
+                    style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                   Text(
                     email.isNotEmpty ? 'Email: $email' : '',

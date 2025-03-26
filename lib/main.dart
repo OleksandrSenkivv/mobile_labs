@@ -14,4 +14,3 @@ void main() => runApp(MaterialApp(
     '/signup': (context) => SignUp(),
   },
 ),);
-
