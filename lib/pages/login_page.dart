@@ -1,14 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_labs/controllers/login_page_controller.dart';
+import 'package:mobile_labs/domain/user_service.dart';
 
-class Login extends StatelessWidget {
-  Login({super.key});
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+class LoginPage extends StatefulWidget {
+  final UserService userService;
+  const LoginPage({required this.userService, super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  late LoginPageController controller;
+  String? error;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = LoginPageController(userService: widget.userService);
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  void _onLoginPressed() async {
+    final user = await controller.tryLogin();
+    if (!mounted) return;
+
+    if (user != null) {
+      Navigator.pushReplacementNamed(context, '/home', arguments: user);
+    } else {
+      setState(() => error = 'Невірний логін або пароль');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Log In'),
@@ -18,57 +48,32 @@ class Login extends StatelessWidget {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              TextField(
-                controller: usernameController,
-                decoration: const InputDecoration(
-                  labelText: 'Username',
-                  border: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green),
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green),
-                  ),
+              if (error != null)
+                Text(
+                  error!,
+                  style: const TextStyle(color: Colors.red),
                 ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: controller.usernameController,
+                decoration: const InputDecoration(labelText: 'Username'),
               ),
+              const SizedBox(height: 10),
               TextField(
-                controller: passwordController,
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                  border: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green),
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green),
-                  ),
-                ),
+                controller: controller.passwordController,
+                decoration: const InputDecoration(labelText: 'Password'),
                 obscureText: true,
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  final String username = usernameController.text.trim();
-                  if (username.isNotEmpty) {
-                    Navigator.pushNamed(
-                      context,
-                      '/home',
-                      arguments: {'username': username, 'email': ''},
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green.shade100,
-                  foregroundColor: Colors.black,
-                  minimumSize: Size(screenWidth * 0.6, 50),
-                ),
-                child: const Text('Login',
-                    style: TextStyle(fontSize: 18, color: Colors.black),),
+                onPressed: _onLoginPressed,
+                child: const Text('Login'),
               ),
               TextButton(
                 onPressed: () => Navigator.pushNamed(context, '/signup'),
-                child: const Text('Sign Up',
-                    style: TextStyle(fontSize: 18, color: Colors.green),),
+                child: const Text('Sign Up'),
               ),
             ],
           ),
