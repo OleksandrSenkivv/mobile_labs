@@ -6,6 +6,8 @@ import 'package:mobile_labs/pages/home_page.dart';
 import 'package:mobile_labs/pages/login_page.dart';
 import 'package:mobile_labs/pages/profile_page.dart';
 import 'package:mobile_labs/pages/signup_page.dart';
+import 'package:mobile_labs/service/internet_service.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,11 +18,18 @@ void main() async {
   const FlutterSecureStorage secureStorage = FlutterSecureStorage();
   final String? isLoggedIn = await secureStorage.read(key: 'isLoggedIn');
 
-  runApp(MyApp(
-    userService: service,
-    initialUser: user,
-    initialRoute: isLoggedIn == 'true' ? '/home' : '/login',
-  ),);
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => NetworkProvider()),
+      ],
+      child: MyApp(
+        userService: service,
+        initialUser: user,
+        initialRoute: isLoggedIn == 'true' ? '/home' : '/login',
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -52,7 +61,8 @@ class MyApp extends StatelessWidget {
               builder: (_) => SignUpPage(userService: userService),
             );
           case '/home':
-            final args = settings.arguments as Map<String, String>? ?? initialUser;
+            final args = settings.arguments as Map<String, String>? ??
+                initialUser;
             if (args == null) {
               return MaterialPageRoute(
                 builder: (_) => LoginPage(userService: userService),
