@@ -63,6 +63,7 @@ class MyApp extends StatelessWidget {
           case '/home':
             final args = settings.arguments as Map<String, String>? ??
                 initialUser;
+
             if (args == null) {
               return MaterialPageRoute(
                 builder: (_) => LoginPage(userService: userService),
