@@ -43,3 +43,5 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+# Ignore server_info.h file inside the esp8266 folder
+/esp8266/server_info.h

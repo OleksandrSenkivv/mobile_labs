@@ -63,8 +63,13 @@ class MQTTService {
   void publish(String topic, String message) {
     final builder = MqttClientPayloadBuilder();
     builder.addString(message);
-    _mqttClient.publishMessage(topic, MqttQos.atMostOnce, builder.payload!);
+
+    final payload = builder.payload;
+    if (payload != null) {
+      _mqttClient.publishMessage(topic, MqttQos.atMostOnce, payload);
+    }
   }
+
 
   void mqttDisconnect() {
     _mqttClient.disconnect();
