@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_labs/controllers/profile_page_controller.dart';
 import 'package:mobile_labs/domain/user_service.dart';
-
+import 'package:mobile_labs/functions/network_status_bar.dart';
 
 class ProfilePage extends StatefulWidget {
   final UserService userService;
@@ -29,8 +29,8 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildField(String label, String value, TextEditingController?
   controller,) {
     return controller != null
-        ? TextField(controller: controller, decoration:
-    InputDecoration(labelText: label),)
+        ? TextField(controller: controller,
+        decoration: InputDecoration(labelText: label),)
         : Align(
       alignment: Alignment.centerLeft,
       child: Text('$label: $value', style: const TextStyle(fontSize: 18,
@@ -76,7 +76,8 @@ class _ProfilePageState extends State<ProfilePage> {
             if (confirm) {
               await controller.deleteAccount();
               if (mounted) {
-                Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+                Navigator.pushNamedAndRemoveUntil(context, '/login',
+                        (route) => false,);
               }
             }
           },
@@ -92,42 +93,50 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(title: const Text('Profile'),
           backgroundColor: Colors.green,),
-      body: ValueListenableBuilder(
-        valueListenable: controller.user,
-        builder: (context, user, _) {
-          if (user == null) {
-            return const Center(child:
-          CircularProgressIndicator(),);
-          }
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                const CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Colors.lightGreen,
-                  child: Icon(Icons.person, size: 50, color: Colors.white),
-                ),
-                const SizedBox(height: 30),
-                if (controller.error != null)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Text(controller.error!, style: const TextStyle(
-                        color: Colors.red,),),
+      body: Column(
+        children: [
+          const NetworkStatusBar(),
+          Expanded(
+            child: ValueListenableBuilder(
+              valueListenable: controller.user,
+              builder: (context, user, _) {
+                if (user == null) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      const CircleAvatar(
+                        radius: 50,
+                        backgroundColor: Colors.lightGreen,
+                        child: Icon(Icons.person, size: 50,
+                            color: Colors.white,),
+                      ),
+                      const SizedBox(height: 30),
+                      if (controller.error != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: Text(controller.error!, style:
+                          const TextStyle(color: Colors.red),),
+                        ),
+                      _buildField('Логін користувача', user['username'] ?? '',
+                          controller.isEditing ?
+                          controller.usernameController : null,),
+                      const SizedBox(height: 10),
+                      _buildField('Пошта користувача', user['email'] ?? '',
+                          controller.isEditing ?
+                          controller.emailController : null,),
+                      const SizedBox(height: 30),
+                      _buildButtons(user),
+                    ],
                   ),
-                _buildField('Логін користувача', user['username'] ?? '',
-                    controller.isEditing ?
-                    controller.usernameController : null,),
-                const SizedBox(height: 10),
-                _buildField('Пошта користувача', user['email'] ?? '',
-                    controller.isEditing ? controller.emailController : null,),
-                const SizedBox(height: 30),
-                _buildButtons(user),
-              ],
+                );
+              },
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }

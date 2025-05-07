@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_labs/controllers/login_page_controller.dart';
 import 'package:mobile_labs/domain/user_service.dart';
+import 'package:mobile_labs/functions/network_status_bar.dart';
+import 'package:mobile_labs/service/internet_service.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
   final UserService userService;
@@ -27,6 +30,13 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _onLoginPressed() async {
+    final networkProvider = context.read<NetworkProvider>();
+
+    if (!networkProvider.isConnected) {
+      setState(() => error = 'Немає підключення до Інтернету');
+      return;
+    }
+
     final user = await controller.tryLogin();
     if (!mounted) return;
 
@@ -44,40 +54,47 @@ class _LoginPageState extends State<LoginPage> {
         title: const Text('Log In'),
         backgroundColor: Colors.green,
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (error != null)
-                Text(
-                  error!,
-                  style: const TextStyle(color: Colors.red),
+      body: Column(
+        children: [
+          const NetworkStatusBar(),
+          Expanded(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (error != null)
+                      Text(
+                        error!,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: controller.usernameController,
+                      decoration: const InputDecoration(labelText: 'Username'),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: controller.passwordController,
+                      decoration: const InputDecoration(labelText: 'Password'),
+                      obscureText: true,
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _onLoginPressed,
+                      child: const Text('Login'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pushNamed(context, '/signup'),
+                      child: const Text('Sign Up'),
+                    ),
+                  ],
                 ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: controller.usernameController,
-                decoration: const InputDecoration(labelText: 'Username'),
               ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: controller.passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _onLoginPressed,
-                child: const Text('Login'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pushNamed(context, '/signup'),
-                child: const Text('Sign Up'),
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
