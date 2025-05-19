@@ -56,16 +56,21 @@ class _HomePageState extends State<HomePage> {
               onTap: () => Navigator.pushNamed(context, '/profile'),
             ),
             ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Налаштування'),
+              onTap: () => Navigator.pushNamed(context, '/settings'), // Додано
+            ),
+            ListTile(
               leading: const Icon(Icons.exit_to_app),
               title: const Text('Вийти'),
-                onTap: () async {
-                  final confirm = await showLogoutDialog(context);
-                  if (confirm == true) {
-                    await controller.logout();
-                    if (!context.mounted) return;
-                    Navigator.pushReplacementNamed(context, '/login');
-                  }
-                },
+              onTap: () async {
+                final confirm = await showLogoutDialog(context);
+                if (confirm == true) {
+                  await controller.logout();
+                  if (!context.mounted) return;
+                  Navigator.pushReplacementNamed(context, '/login');
+                }
+              },
             ),
           ],
         ),
@@ -90,7 +95,7 @@ class _HomePageState extends State<HomePage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text('Вітаю, ${widget.username}!',
-                                    style: const TextStyle(fontSize: 24),),
+                                  style: const TextStyle(fontSize: 24),),
                                 const SizedBox(height: 30),
                                 Icon(
                                   isPlugOn ? Icons.power : Icons.power_off,
@@ -99,7 +104,7 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 const SizedBox(height: 20),
                                 Text('Вольтаж: ${voltage.toStringAsFixed(1)} V',
-                                    style: const TextStyle(fontSize: 22),),
+                                  style: const TextStyle(fontSize: 22),),
                                 const SizedBox(height: 10),
                                 Text('Споживання: ${consumption.toStringAsFixed
                                   (1)} W', style:
@@ -111,7 +116,7 @@ class _HomePageState extends State<HomePage> {
                                     backgroundColor: isPlugOn ? Colors.red :
                                     Colors.green,
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 32, vertical: 16,),
+                                      horizontal: 32, vertical: 16,),
                                   ),
                                   child: Text(
                                     isPlugOn ? 'Вимкнути розетку' :
