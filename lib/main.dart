@@ -5,8 +5,8 @@ import 'package:mobile_labs/domain/user_service.dart';
 import 'package:mobile_labs/pages/home_page.dart';
 import 'package:mobile_labs/pages/login_page.dart';
 import 'package:mobile_labs/pages/profile_page.dart';
-import 'package:mobile_labs/pages/signup_page.dart';
-import 'package:mobile_labs/pages/settings_page.dart'; // Імпортуємо сторінку налаштувань
+import 'package:mobile_labs/pages/settings_page.dart';
+import 'package:mobile_labs/pages/signup_page.dart'; 
 import 'package:mobile_labs/service/internet_service.dart';
 import 'package:provider/provider.dart';
 
@@ -80,7 +80,7 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(
               builder: (_) => ProfilePage(userService: userService),
             );
-          case '/settings': // Додаємо маршрут для налаштувань
+          case '/settings': 
             return MaterialPageRoute(
               builder: (_) => const SettingsPage(),
             );
