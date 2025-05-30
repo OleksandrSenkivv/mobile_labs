@@ -79,7 +79,9 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(
               builder: (_) => ProfilePage(userService: userService),
             );
+
           case '/settings':
+
             return MaterialPageRoute(
               builder: (_) => const SettingsPage(),
             );
