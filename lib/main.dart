@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile_labs/data/user_storage_secure.dart';
 import 'package:mobile_labs/domain/user_service.dart';
-import 'package:mobile_labs/pages/home_page.dart';
-import 'package:mobile_labs/pages/login_page.dart';
-import 'package:mobile_labs/pages/profile_page.dart';
-import 'package:mobile_labs/pages/settings_page.dart';
-import 'package:mobile_labs/pages/signup_page.dart'; 
+import 'package:mobile_labs/pages/counter/view/counter_page.dart';
+import 'package:mobile_labs/pages/home/view/home_page.dart';
+import 'package:mobile_labs/pages/login/view/login_page.dart';
+import 'package:mobile_labs/pages/profile/view/profile_page.dart';
+import 'package:mobile_labs/pages/settings/view/settings_page.dart';
+import 'package:mobile_labs/pages/signup/view/signup_page.dart';
 import 'package:mobile_labs/service/internet_service.dart';
 import 'package:provider/provider.dart';
 
@@ -16,8 +16,7 @@ void main() async {
   final storage = SecureUserStorage();
   final service = UserService(storage);
   final user = await service.getUser();
-  const FlutterSecureStorage secureStorage = FlutterSecureStorage();
-  final String? isLoggedIn = await secureStorage.read(key: 'isLoggedIn');
+  final isLoggedIn = await storage.isLoggedIn();
 
   runApp(
     MultiProvider(
@@ -27,7 +26,7 @@ void main() async {
       child: MyApp(
         userService: service,
         initialUser: user,
-        initialRoute: isLoggedIn == 'true' ? '/home' : '/login',
+        initialRoute: isLoggedIn ? '/home' : '/login',
       ),
     ),
   );
@@ -62,9 +61,8 @@ class MyApp extends StatelessWidget {
               builder: (_) => SignUpPage(userService: userService),
             );
           case '/home':
-            final args = settings.arguments as Map<String, String>? ??
-                initialUser;
-
+            final args = settings.arguments as Map<String, String>?
+                ?? initialUser;
             if (args == null) {
               return MaterialPageRoute(
                 builder: (_) => LoginPage(userService: userService),
@@ -74,15 +72,22 @@ class MyApp extends StatelessWidget {
               builder: (_) => HomePage(
                 username: args['username']!,
                 email: args['email']!,
+                userService: userService,
               ),
             );
           case '/profile':
             return MaterialPageRoute(
               builder: (_) => ProfilePage(userService: userService),
             );
-          case '/settings': 
+
+          case '/settings':
+
             return MaterialPageRoute(
               builder: (_) => const SettingsPage(),
+            );
+          case '/counter':
+            return MaterialPageRoute(
+              builder: (_) => const CounterPage(),
             );
           default:
             return MaterialPageRoute(

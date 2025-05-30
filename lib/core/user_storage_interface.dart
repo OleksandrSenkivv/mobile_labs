@@ -3,4 +3,5 @@ abstract class UserStorageInterface {
   Future<Map<String, String>?> getUser();
   Future<bool> validateUser(String username, String password);
   Future<void> clearUser();
+  Future<void> clearLoginStatus();
 }

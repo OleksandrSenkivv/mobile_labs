@@ -1,18 +1,16 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 
 typedef SetDeviceInfo = void Function(String?, String?, bool);
-typedef ShowSerialEditor = void Function();
 typedef ShowError = void Function(String);
+typedef VoidCallback = void Function();
 typedef IsExpectingConfirmation = bool Function();
 typedef ClearConfirmation = void Function();
 
-void handleMqttMessage({
-  required BuildContext context,
+void processMqttMessage({
   required String topic,
   required String payload,
   required SetDeviceInfo setDeviceInfo,
-  required ShowSerialEditor showSerialEditor,
+  required VoidCallback onSerialConfirmed,
   required ShowError showError,
   required IsExpectingConfirmation isExpectingConfirmation,
   required ClearConfirmation clearConfirmation,
@@ -20,8 +18,8 @@ void handleMqttMessage({
   try {
     final decoded = jsonDecode(payload);
 
-    if (topic == 'device/info_response' || (decoded['serial'] != null
-        && decoded['device'] != null)) {
+    if (topic == 'device/info_response' ||
+        (decoded['serial'] != null && decoded['device'] != null)) {
       final serial = decoded['serial'] as String?;
       final device = decoded['device'] as String?;
       setDeviceInfo(serial, device, true);
@@ -32,7 +30,7 @@ void handleMqttMessage({
       if (decoded['status'] == 'success') {
         if (isExpectingConfirmation()) {
           clearConfirmation();
-          showSerialEditor();
+          onSerialConfirmed();
         }
       } else if (decoded['error'] != null) {
         showError('Невірні креденшинали');
