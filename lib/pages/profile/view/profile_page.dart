@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_labs/domain/user_service.dart';
+import 'package:mobile_labs/functions/confirm_delete_dialog.dart';
 import 'package:mobile_labs/functions/network_status_bar.dart';
 import 'package:mobile_labs/pages/profile/cubit/profile_cubit.dart';
 import 'package:mobile_labs/pages/profile/cubit/profile_state.dart';
@@ -54,12 +55,12 @@ class ProfilePage extends StatelessWidget {
         const SizedBox(width: 10),
         OutlinedButton(
           onPressed: () async {
-            final confirm = await cubit.confirmDelete(context);
+            final confirm = await showConfirmDeleteDialog(context);
             if (confirm) {
               await cubit.deleteAccount();
               if (context.mounted) {
-                Navigator.pushNamedAndRemoveUntil(context, '/login', (route)
-                => false,);
+                Navigator.pushNamedAndRemoveUntil(context, '/login', (route) =>
+                false,);
               }
             }
           },

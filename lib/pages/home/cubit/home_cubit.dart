@@ -3,6 +3,7 @@ import 'dart:isolate';
 import 'dart:math';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_labs/data/user_storage_secure.dart';
+import 'package:mobile_labs/service/mqtt_initializer.dart';
 import 'package:mobile_labs/service/mqtt_service.dart';
 
 part 'home_state.dart';
@@ -23,43 +24,31 @@ class HomeCubit extends Cubit<HomeState> {
     final savedStatus = await _storage.getSmartPlugStatus();
     emit(state.copyWith(isPlugOn: savedStatus));
     if (savedStatus) {
-      _startListeningData();
+      _mqttService = initMQTT(this);
+    }
+  }
+
+  void updateSensorData(String topic, double value) {
+    if (!state.isPlugOn) return;
+
+    if (topic == 'home/voltage') {
+      emit(state.copyWith(voltage: value));
+    } else if (topic == 'home/consumption') {
+      emit(state.copyWith(consumption: value));
     }
   }
 
   void togglePlug() async {
     final newStatus = !state.isPlugOn;
     emit(state.copyWith(isPlugOn: newStatus));
-
     await _storage.saveSmartPlugStatus(newStatus);
 
     if (newStatus) {
-      _startListeningData();
+      _mqttService = initMQTT(this);
     } else {
       _stopListeningData();
       emit(state.copyWith(voltage: 220, consumption: 0));
     }
-  }
-
-  void _startListeningData() {
-    _mqttService ??= MQTTService(
-      username: 'My_Cred',
-      password: 'MyCred1234',
-      mqttBroker: 'd92fdeed0d5d48028f3ae826a28a79e0.s1.eu.hivemq.cloud',
-      topics: ['home/voltage', 'home/consumption'],
-      onMessageReceived: (topic, message) {
-        final value = double.tryParse(message.trim());
-        if (value == null) return;
-
-        if (topic == 'home/voltage') {
-          emit(state.copyWith(voltage: value));
-        } else if (topic == 'home/consumption') {
-          emit(state.copyWith(consumption: value));
-        }
-      },
-    );
-
-    _mqttService!.connect();
   }
 
   void _stopListeningData() {

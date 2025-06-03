@@ -46,27 +46,6 @@ class ProfileCubit extends Cubit<ProfileState> {
     emit(state.copyWith(isEditing: false));
   }
 
-  Future<bool> confirmDelete(BuildContext context) async {
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Видалити акаунт'),
-        content: const Text('Ви впевнені, що хочете видалити акаунт?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Скасувати'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Так'),
-          ),
-        ],
-      ),
-    );
-    return result == true;
-  }
-
   Future<void> deleteAccount() async {
     await userService.deleteUser();
   }

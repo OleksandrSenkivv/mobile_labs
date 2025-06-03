@@ -7,6 +7,9 @@ part 'login_state.dart';
 class LoginCubit extends Cubit<LoginState> {
   final UserService userService;
   final SecureUserStorage _storage = SecureUserStorage();
+  static const String invalidCredentials = 'Невірний логін або пароль';
+  static const String receivingDataError =
+      'Помилка при отриманні даних користувача';
 
   LoginCubit({required this.userService}) : super(LoginState.initial());
 
@@ -28,7 +31,7 @@ class LoginCubit extends Cubit<LoginState> {
     final success = await userService.login(state.username, state.password);
     if (!success) {
       emit(state.copyWith(isLoading: false, errorMessage:
-      'Невірний логін або пароль',),);
+      invalidCredentials,),);
       return;
     }
 
@@ -38,7 +41,7 @@ class LoginCubit extends Cubit<LoginState> {
       emit(state.copyWith(isLoading: false, user: user));
     } else {
       emit(state.copyWith(isLoading: false, errorMessage:
-      'Помилка при отриманні даних користувача',),);
+      receivingDataError,),);
     }
   }
 }

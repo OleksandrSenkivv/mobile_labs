@@ -17,7 +17,6 @@ class UserService {
 
     await storage.saveUser(username, email, password);
 
-    // Зберегти статус входу
     if (storage is SecureUserStorage) {
       await (storage as SecureUserStorage).saveUserLoginStatus(true);
     }
@@ -28,7 +27,6 @@ class UserService {
   Future<bool> login(String username, String password) async {
     final isValid = await storage.validateUser(username, password);
 
-    // Якщо логін успішний — зберігаємо статус входу
     if (isValid && storage is SecureUserStorage) {
       await (storage as SecureUserStorage).saveUserLoginStatus(true);
     }

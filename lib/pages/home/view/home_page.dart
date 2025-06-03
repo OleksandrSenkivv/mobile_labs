@@ -87,7 +87,6 @@ class HomeView extends StatelessWidget {
                 final confirm = await showLogoutDialog(context);
                 if (confirm == true) {
                   await cubit.logout();
-                  await cubit.close();
                   await userService.storage.clearLoginStatus();
                   navigator.pushReplacementNamed('/login');
                 }
