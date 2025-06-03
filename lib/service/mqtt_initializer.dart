@@ -1,11 +1,12 @@
-import 'package:mobile_labs/controllers/home_page_controller.dart';
+import'package:mobile_labs/constants/mqtt_constants.dart';
+import 'package:mobile_labs/pages/home/cubit/home_cubit.dart';
 import 'package:mobile_labs/service/mqtt_service.dart';
 
-MQTTService initMQTT(HomePageController controller) {
-  return MQTTService(
-    username: 'My_Cred',
-    password: 'MyCred1234',
-    mqttBroker: '28c5545e26094092b6785f4d24098c1f.s1.eu.hivemq.cloud',
+MQTTService initMQTT(HomeCubit cubit) {
+  final service = MQTTService(
+    username: mqttUsername,
+    password: mqttPassword,
+    mqttBroker: mqttBroker,
     topics: [
       'home/voltage',
       'home/consumption',
@@ -14,16 +15,10 @@ MQTTService initMQTT(HomePageController controller) {
       final double? value = double.tryParse(message.trim());
       if (value == null) return;
 
-      if (!controller.isPlugOn.value) return;
-
-      switch (topic) {
-        case 'home/voltage':
-          controller.voltage.value = value;
-          break;
-        case 'home/consumption':
-          controller.consumption.value = value;
-          break;
-      }
+      cubit.updateSensorData(topic, value);
     },
   );
+
+  service.connect();
+  return service;
 }

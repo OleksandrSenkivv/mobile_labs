@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:mobile_labs/data/user_storage_secure.dart';
+import 'package:mobile_labs/functions/amper_measure.dart';
 import 'package:mobile_labs/service/mqtt_service.dart';
 
 class HomePageController {
@@ -9,11 +10,13 @@ class HomePageController {
   final ValueNotifier<bool> isPlugOn = ValueNotifier(false);
   final ValueNotifier<double> voltage = ValueNotifier(220);
   final ValueNotifier<double> consumption = ValueNotifier(0);
+  final ValueNotifier<double> amper = ValueNotifier(0);
 
   MQTTService? _mqttService;
 
   HomePageController() {
     _loadSmartPlugStatus();
+    _startAmperMeasure();
   }
 
   Future<void> _loadSmartPlugStatus() async {
@@ -47,7 +50,6 @@ class HomePageController {
       onMessageReceived: (topic, message) {
         final value = double.tryParse(message.trim());
         if (value == null) return;
-
         if (topic == 'home/voltage') {
           voltage.value = value;
         } else if (topic == 'home/consumption') {
@@ -63,6 +65,14 @@ class HomePageController {
     _mqttService?.mqttDisconnect();
   }
 
+  void _startAmperMeasure() {
+    AmperMeasure.start((a) => amper.value = a);
+  }
+
+  void _stopAmperMeasure() {
+    AmperMeasure.stop();
+  }
+
   Future<void> logout() async {
     await _storage.saveUserLoginStatus(false);
   }
@@ -71,6 +81,8 @@ class HomePageController {
     isPlugOn.dispose();
     voltage.dispose();
     consumption.dispose();
+    amper.dispose();
     _stopListeningData();
+    _stopAmperMeasure();
   }
 }

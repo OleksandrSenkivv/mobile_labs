@@ -18,6 +18,16 @@ class SecureUserStorage implements UserStorageInterface {
     );
   }
 
+  @override
+  Future<void> clearLoginStatus() async {
+    await _storage.delete(key: 'isLoggedIn');
+  }
+
+  Future<bool> isLoggedIn() async {
+    final value = await _storage.read(key: 'isLoggedIn');
+    return value == 'true';
+  }
+
   Future<void> saveSmartPlugStatus(bool isPlugOn) async {
     await _storage.write(
       key: 'isPlugOn',
@@ -42,13 +52,12 @@ class SecureUserStorage implements UserStorageInterface {
     return null;
   }
 
-
   @override
   Future<bool> validateUser(String username, String password) async {
     final storedUser = await getUser();
     if (storedUser == null) return false;
-    return storedUser['username'] == username && storedUser['password']
-        == password;
+    return storedUser['username'] == username &&
+        storedUser['password'] == password;
   }
 
   @override
